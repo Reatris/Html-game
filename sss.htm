@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title></title>
+		<style>
+			*{
+				margin: 0;
+				padding: 0;
+			}
+			
+			/*主窗口界面*/
+			#mainScreen{
+				width: 1500px;
+				height: 768px;
+				margin: 0 auto;
+				position: relative;
+			}
+			/*背景图片样式*/
+			.bg{
+				width:100%;
+				height:100%;
+				margin: 0 auto;
+				background: url(img/bj2.jpg) center bottom /100% auto;
+				position: relative;
+				overflow: hidden;
+				animation:movebg 3000s linear infinite;
+			}
+			@keyframes movebg
+			    {
+					from {background-position:0 10000%;} to {background-position:0 0%;}
+			    }
+			/*飞机图片样式*/
+			#airplane{
+				width: 109px;
+				height: 82px;
+				background-image: url(img/air.png);
+				position: absolute;
+				left: 200px;
+				top: 600px;
+			}
+
+			.boss{
+				width:256px;
+				height:562px;
+				background-image: url(img/boss.png);
+				background-size: cover;
+				position: absolute;
+				left: 200px;
+				top: 600px;
+			}
+			/*子弹样式*/
+			.bullent{
+				position: absolute;
+				width: 5px;
+				height: 5px;
+				border-radius: 50%;
+				background-color: yellow;	
+			}
+			
+			/*敌人样式*/
+			.tank{
+				position: absolute;
+				width: 50px;
+				height: 50px;
+				background-image: url(img/tank.png);
+				background-size: 50px 50px;
+			}
+			
+			/*游戏结束*/
+			p{
+				width: 400px;
+				height: 100px;
+				color: red;
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				margin-left: -200px;
+				font-size: 30px;
+			}
+			.cg1{
+				left:100px;
+				top:0;
+				width: 600px;
+				height: 304px;
+				background-image: url(img/CG1.gif);
+				background-size:cover;
+				position: fixed;
+				z-index: 999;
+				
+
+			}
+			.cg2{
+				left:100px;
+				top:0;
+				width: 424px;
+				height: 202px;
+				background-image: url(img/CG2.gif);
+				background-size:cover;
+				position: fixed;
+				z-index: 999;
+				
+
+			}
+			#light{
+				width: 1550px;
+				height: 1440px;
+				background-image:url(img/light.gif);
+				background-size:cover;
+				position: absolute;
+				z-index: 999;
+				display: none;
+			}
+		</style>
+	</head>
+
+<body >
+	<div id="mainScreen">
+		<div id="bg" class="bg"></div>
+		<!--创建飞机-->
+		<div id="light">sdcds</div>
+		<div id="airplane"></div>
+	</div>
+	<script src="jjt.js"></script>
+	<script>
+		var gameresult_flag=false;
+		 
+		//speed<100
+		function boss(name,hp,x,y){
+			this.name = name;
+			this.hp = hp;
+			this.x=x
+			this.y =y
+			this.ishoted = false //被攻击判定
+			this.lighting=false //攻击状态
+			this.attack = false //攻击方式
+			this.attacking = false //攻击状态判定
+			//this.speed = 100/speed
+		}
+		var bossx_dis=0
+		var bossy_dis=0
+		var boss1= new boss('plantkiller',50,-300,-522)
+
+
+		var audio = document.createElement('audio');
+		var source = document.createElement('source');   
+		source.type = "audio/mpeg";
+		source.type = "audio/mpeg";
+		source.src = 'img/Event_8bit.ogg';   
+		audio.className='audio1'
+		source.autoplay = "autoplay";
+		source.controls = "controls";
+		audio.loop='loop';
+		audio.appendChild(source); 
+		audio.play();
+
+		var audio_light = document.createElement('audio');
+		var source_light = document.createElement('source');   
+		source_light.type = "audio/mpeg";
+		source_light.type = "audio/mpeg";
+		source_light.src = 'http://img02.tuke88.com/newpreview_music/09/00/42/5c89245b1d6ef77310.mp3';   
+		audio_light.className='audio_light'
+		source_light.autoplay = "autoplay";
+		//audio_light.loop='loop';
+		source_light.controls = "controls";
+		audio_light.appendChild(source_light); 
+
+		var audio_shot = document.createElement('audio');
+		var source_shot = document.createElement('source');   
+		source_shot.type = "audio/mpeg";
+		source_shot.type = "audio/mpeg";
+		source_shot.src = 'http://img02.tuke88.com/newpreview_music/08/99/11/5c88e18bdee8e37540.mp3';   
+		audio_shot.className='audio_shot'
+		source_shot.autoplay = "autoplay";
+		source_shot.controls = "controls";
+		audio_shot.appendChild(source_shot); 
+
+		
+
+		function bossrunway(){
+			//console.info('ssss')
+			setInterval(function(){
+				bossx_dis=plane.offsetLeft
+				bossy_dis=Math.floor(Math.random()*(600-400+1)+0)-256;
+				//console.info(bossy_dis)
+			},1400)
+			setInterval(function(){
+				if(boss1.attack==true){//和飞机x距离一定时发动射线
+					if(bossx_dis-boss1.x<100 && bossx_dis-boss1.x>-100){
+						//boss1.lighting=true;
+						if(boss1.attacking==false){
+							lightattack();//开始射线攻击
+						} //判定是否正在攻击
+					}
+				}
+				if(boss1.x<=bossx_dis){
+					boss1.x+=5
+				}
+				if(boss1.x>bossx_dis){
+					boss1.x-=5
+				}
+				if(boss1.y<=bossy_dis){
+					boss1.y+=5;
+
+				}
+				if(boss1.y>bossy_dis){
+					boss1.y-=5;
+				}
+			},50)
+			
+		}
+
+
+
+		function boss_timebullent(){
+			//发射子弹
+			//.info('开始发射子弹')
+
+			var boss_timebullents = setInterval(function(){
+				//创建子弹div
+				var bullent = document.createElement('div');
+				//给子弹添加一个类名,在CSS中修饰子弹
+				bullent.className = 'bullent';
+				bullent.style.left = boss1.x + 53 +'px';/* 定义子弹出现的位置 */
+				bullent.style.top = boss1.y +586 + 'px';
+				mainscreen.appendChild(bullent);//创建一个子弹
+				
+				//让子弹飞
+				var bullentfly = setInterval(function(){
+					bullent.style.top = bullent.offsetTop +20 + 'px';//设置子弹飞行的速度
+					//当子弹超出主屏幕时
+					if(bullent.offsetTop>= 768){
+						
+						clearInterval(bullentfly);//关闭让子弹飞
+						mainscreen.removeChild(bullent);//将子弹消除
+					}
+				},100)
+			},1100)
+		}
+
+
+		function lightattack(){
+			boss1.lighting=true
+			audio_light.play()
+			//console.info('light attack start')
+			setTimeout(function(){
+				boss1.lighting=false
+				boss1.attacking=false
+				//console.info('lighting attack over')
+			},3000)
+			setTimeout(function(){
+				//console.info('====')
+				var flag = true
+				var gameover=setInterval(function(){
+					//console.info('开始伤害判定')
+					if(boss1.lighting==true){
+						//console.info('====')
+						//console.info('bossx')
+						//console.info(boss1.x-plane.offsetLeft)
+						//console.info(plane.offsetLeft-boss1.x)
+						if(!(boss1.x-plane.offsetLeft>100||plane.offsetLeft-boss1.x>200)){
+							//console.info('====')
+							if(gameresult_flag==false){
+								gameresult_flag=true
+								audio_shot.play()
+								var gameover = document.createElement('p');
+								gameover.className = 'gameover';
+								gameover.innerHTML = '你失败了，游戏结束,鼠标拖动或者上下左右移动，10分后BOSS来袭';
+								mainscreen.appendChild(gameover);
+								break;
+							}
+							//clearInterval(gameover);
+							//清除判定
+							flag=false
+							//console.info('game over')
+						}
+					}
+				},10)
+				setTimeout(function(){
+					if(flag==true){
+						clearInterval(gameover);
+						//console.info('清除伤害判定，游戏未结束');
+					}else{
+						clearInterval(gameover);
+					}
+					
+				},1500)
+				
+			},700)//2s后触判定
+		}
+		
+
+		function createboss(){
+			bossrunway();
+			boss_timebullent()
+			//console.info('hp')
+
+			//这是boss的血量
+			var boss_hp = document.createElement('div');
+			boss_hp.style.position='fixed';
+			boss_hp.style.backgroundColor='rgba(0,0,0,0)'
+			boss_hp.style.border='3px solid rgba(255,255,255,1)'
+			boss_hp.style.width='300px';
+			boss_hp.style.height='30px';
+			boss_hp.style.left = '700px';
+			boss_hp.style.top= '50px'
+			boss_hp.style.textAlign='right'
+			boss_hp.textContent='BOSS  HP'
+			mainscreen.appendChild(boss_hp);
+
+			setInterval(function(){
+				
+				var Boss = document.createElement('div');
+				Boss.className = 'boss';
+				Boss.style.left =boss1.x -85 +'px';
+				//Boss.style.left = plane.offsetLeft - 100 +'px';
+				Boss.style.top = boss1.y + 'px';
+				if(boss1.hp<0){
+					Boss.style.backgroundImage="url(img/boom2.gif)";
+					Boss.style.width='555px';
+					Boss.style.height='555px';
+				}else{
+					if(boss1.ishoted){
+						Boss.style.backgroundImage="url(img/boss2.png)";
+						audio_shot.play()
+					}else{
+						if(boss1.lighting==true){
+							Boss.style.backgroundImage="url(img/boss2.png)";
+						}else{
+							Boss.style.backgroundImage="url(img/boss.png)";
+						}
+					}
+				}
+				
+				if(boss1.lighting==true){
+					//console.info('sss')
+					var lighting=document.getElementById("light")
+					lighting.style.left=boss1.x-738+'px'
+					lighting.style.top=boss1.y-122+'px'
+					lighting.style.display='block';
+				}else{
+					var lighting=document.getElementById("light")
+					lighting.style.display='none';
+				}
+				if(boss1.hp==30){
+					boss1.hp-=1
+					boss1.attack=true
+					lightstart()//cg2
+					lightattack()//射线攻击
+				}
+				//console.info('boss1.y')
+				//console.info(boss1.y)
+				mainscreen.appendChild(Boss);
+				setTimeout(function(){
+					mainscreen.removeChild(Boss);
+				},50)
+			},50)
+		}
+		function lightstart(){
+			var cg2 = document.createElement('div');
+			cg2.className = 'cg2';
+			mainscreen.appendChild(cg2);
+			setTimeout(function(){
+				mainscreen.removeChild(cg2)
+				console.info('cg2')
+				//mainscreen.style.backgroundImage="url('img/bj2.jpg')";
+			},5500)
+		}
+
+		function bossrun(){
+
+			var audio1 = document.createElement('audio');
+			var source1 = document.createElement('source');   
+			source1.type = "audio/mpeg";
+			source1.type = "audio/mpeg";
+			source1.src = 'img/Event_kronos_boss.ogg';   
+			audio1.className='audio1'
+			audio1.loop='loop';
+			source1.autoplay = "autoplay";
+			source1.controls = "controls";
+			audio1.appendChild(source1); 
+			audio.pause();
+			audio1.play()
+
+
+
+
+			var cg1 = document.createElement('div');
+			cg1.className = 'cg1';
+			console.info('cg1')
+			mainscreen.appendChild(cg1);
+			setTimeout(function(){
+				mainscreen.removeChild(cg1)
+				//mainscreen.style.backgroundImage="url('img/bj2.jpg')";
+				createboss()
+			},6000)
+			shortingboss()
+		}
+		var score = 0;//击败敌机数量
+		var is_shot_boss = function(bt){
+			var bossleft = boss1.x-93;
+			var bosstop = boss1.y;
+			var bosswidth = bossleft + 256;
+			var bossheight = bosstop + 493 ;
+			
+			var obj2left = bt.offsetLeft;
+			var obj2top = bt.offsetTop;
+			var obj2width = obj2left + bt.offsetWidth;
+			var obj2height = obj2top + bt.offsetHeight ;
+			if( !(bossleft > obj2width || bosswidth < obj2left ||bosstop > obj2height ||bossheight < obj2top)){
+				//console.info('111');
+				boss1.hp-=1;
+				if(boss1.hp<0&&gameresult_flag==false){
+					gameresult_flag=true
+					var gameover = document.createElement('p');
+					gameover.className = 'gameover';
+					gameover.innerHTML = '你赢了，游戏结束';
+					mainscreen.appendChild(gameover);
+				}
+				boss_REhp.style.width=boss1.hp*3+'px';
+				boss_REhp.textContent='HP:'+boss1.hp
+				boss1.ishoted=true //被射击
+				//console.info(boss1.hp)
+				return true;
+			}else{
+				//console.info('222');
+				boss1.ishoted=false //没被射击 
+				return false;
+			}
+		}
+
+		
+		
+		
+
+		function shortingboss(){
+			setInterval(function(){
+				var allbullents = document.getElementsByClassName('bullent');//用于获取子弹的数据
+				for(var i = 0;i < allbullents.length;i++){
+					var b = allbullents[i];
+					if(is_shot_boss(b)){
+						score+=1
+						fenshu.textContent='当前分数'+score;
+						mainscreen.removeChild(b);
+					}
+				}
+			},10)
+		}
+
+
+		var mainscreen = document.getElementById('mainScreen');
+		//拖拽让飞机动起来
+		var plane = document.getElementById('airplane');
+		//给飞机添加鼠标按下事件
+		var boss_REhp = document.createElement('div');
+		boss_REhp.style.position='fixed';
+		boss_REhp.style.backgroundColor='green'
+		boss_REhp.style.width='300px';
+		boss_REhp.style.height='31px';
+		boss_REhp.style.left = '700px';
+		boss_REhp.style.top= '50px'
+		boss_REhp.style.textAlign='center'
+		boss_REhp.textContent='BOSS  HP:'+boss1.hp
+		mainscreen.appendChild(boss_REhp);
+		//分数纪录
+		var fenshu = document.createElement('div');
+		fenshu.style.position='fixed';
+		fenshu.style.backgroundColor='white'
+		fenshu.style.width='100px';
+		fenshu.style.height='20px';
+		fenshu.style.left = '700px';
+		fenshu.style.top= '90px'
+		fenshu.style.textAlign='center'
+		fenshu.textContent='当前分数'+score;
+		mainscreen.appendChild(fenshu);
+
+		var rebt = document.createElement('div');
+		rebt.style.position='fixed';
+		rebt.style.backgroundColor='white'
+		rebt.style.width='40px';
+		rebt.style.height='20px';
+		rebt.style.left = '880px';
+		rebt.style.top= '90px'
+		rebt.style.textAlign='center'
+		rebt.textContent='重来';
+		rebt.onclick=function(){restart()}
+		mainscreen.appendChild(rebt);
+		function restart(){
+			console.info('restart')
+			window.location.reload();
+		}
+
+		//====================================================================REA==================
+		plane.addEventListener('mousedown',function(e){
+			var ev = e || window.event;
+			//获取飞机当前位置
+			basex = ev.pageX;
+			basey = ev.pageY;
+			// console.log(basex,basey)
+			//设置飞机移动位置，给定初始值为0
+			movex = 0;
+			movey = 0;
+			//给窗口添加监听事件,鼠标移动
+			mainscreen.onmousemove = function(e){
+				var ee = e || window.event;
+				movex = ee.pageX - basex;
+				basex = ee.pageX;
+				movey = ee.pageY - basey;
+				basey = ee.pageY;
+				// console.log(movex,movey)
+				plane.style.left = plane.offsetLeft + movex + 'px';
+				plane.style.top = plane.offsetTop + movey + 'px';
+			}
+			//鼠标抬起时取消事件
+			plane.addEventListener('mouseup',function(){
+				mainscreen.onmousemove = null;
+			})
+		})
+		//发射子弹
+		var timebullent = setInterval(function(){
+			//创建子弹div
+			var bullent = document.createElement('div');
+			//给子弹添加一个类名,在CSS中修饰子弹
+			bullent.className = 'bullent';
+			bullent.style.left = plane.offsetLeft + 53 +'px';/* 定义子弹出现的位置 */
+			bullent.style.top = plane.offsetTop -40 + 'px';
+			mainscreen.appendChild(bullent);//创建一个子弹
+			
+			//让子弹飞
+			var bullentfly = setInterval(function(){
+				bullent.style.top = bullent.offsetTop -20 + 'px';//设置子弹飞行的速度
+				//当子弹超出主屏幕时
+				if(bullent.offsetTop <= 0){
+					
+					clearInterval(bullentfly);//关闭让子弹飞
+					mainscreen.removeChild(bullent);//将子弹消除
+				}
+			},50)
+		},500)
+		
+		//随机数  敌人位置
+		function randomNum(min,max){
+			return parseInt(Math.random() * (max - min) + min);
+		}
+		//敌方下落
+		var timetank = setInterval(function(){
+			//创建敌人div
+			var tank = document.createElement('div');
+			//给子弹添加一个类名,在CSS中修饰子弹
+			tank.className = 'tank';
+			tank.style.left = randomNum(0,1400) + 'px';  //设置敌人出现的位置
+			tank.style.top = '0px';
+			mainscreen.appendChild(tank);//创建敌人
+			
+			//让敌人进攻
+			var tankfly = setInterval(function(){
+				tank.style.top = tank.offsetTop + 15 + 'px';
+				//当敌人超出主屏幕时
+				if(tank.offsetTop >= 768){
+					clearInterval(tankfly);
+					mainscreen.removeChild(tank);
+				}
+			},50)
+		},1000)
+		//子弹和敌人碰撞检测
+		setInterval(function(){
+			var alltanks = document.getElementsByClassName('tank');//用于获取敌人的数据
+			var allbullents = document.getElementsByClassName('bullent');//用于获取子弹的数据
+			for(var i = 0;i < allbullents.length;i++){
+
+				//子弹对自己的判定
+				var bts = allbullents[i];
+				if(pzjcfun(bts,plane)){
+					for(var j = 0;j<100;j++){
+						clearInterval(j);
+					}
+					if(gameresult_flag==false){
+						audio_shot.play()
+						gameresult_flag=true
+						var gameover = document.createElement('p');
+						gameover.className = 'gameover';
+						gameover.innerHTML = '你失败了，游戏结束,鼠标拖动或者上下左右移动，10分后BOSS来袭';
+						mainscreen.appendChild(gameover);
+						break;
+					}
+				}
+
+				for(var j = 0;j < alltanks.length;j++){
+					var b = allbullents[i];
+					var t = alltanks[j];
+					//子弹和敌人碰撞检测，然后全部移除
+					if(pzjcfun(b,t)){
+						audio_shot.play()
+						mainscreen.removeChild(b);
+						mainscreen.removeChild(t);
+						//baozha
+						
+
+						score+=1;
+						fenshu.textContent='当前分数'+score;
+						if(score==10){
+							
+							bossrun();
+						}
+					}
+
+				}
+			}
+
+
+		},10)
+		
+		var pzjcfun = function(obj1,obj2){//检测飞机是否与敌人相遇
+			var obj1left = obj1.offsetLeft;
+			var obj1top = obj1.offsetTop;
+			var obj1width = obj1left + obj1.offsetWidth;
+			var obj1height = obj1top + obj1.offsetHeight ;
+			
+			var obj2left = obj2.offsetLeft;
+			var obj2top = obj2.offsetTop;
+			var obj2width = obj2left + obj2.offsetWidth;
+			var obj2height = obj2top + obj2.offsetHeight ;
+			
+			if( !(obj1left > obj2width || obj1width < obj2left ||obj1top > obj2height ||obj1height < obj2top)){
+				return true;
+			}else{
+				return false;
+			}
+		}
+		
+		//飞机死亡检测
+		setInterval(function(){
+			var alltanks = document.getElementsByClassName('tank')
+		
+			for(var i = 0;i < alltanks.length;i++){
+				if(pzjcfun(alltanks[i],plane)){
+					for(var j = 0;j<100;j++){
+						clearInterval(j);
+					}
+					if(gameresult_flag==false){
+						audio_shot.play()
+						gameresult_flag=true
+						var gameover = document.createElement('p');
+						gameover.className = 'gameover';
+						gameover.innerHTML = '你失败了，游戏结束,鼠标拖动或者上下左右移动，10分后BOSS来袭';
+						mainscreen.appendChild(gameover);
+						break;
+					}
+				}
+			}
+		},100)
+	</script>
+</body>
+</html>
